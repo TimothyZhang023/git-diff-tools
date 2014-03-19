@@ -2,76 +2,57 @@
 # admin@zts1993.com
 __author__ = 'TianShuo'
 
-import re, os, urllib2, shutil
+import re, os, shutil
 
 
-def run(patch_dir, project_path, out_path):
-    # try:
-    #     os.chdir(patch_dir)
-    # except Exception, e:
-    #     raise e
+def run(patch_dir, project_path, final_folder):
+    patch_files = os.listdir(patch_dir)
+    for file_name in patch_files:
 
-    files = os.listdir(patch_dir)
-    for file in files:
-        matchfilename = r'\d{4}-'
-        order = re.findall(matchfilename, file, re.S)
-        order_num = order[0]
-
-        patch_file = patch_dir + os.sep + file
+        patch_file = patch_dir + os.sep + file_name
         print u'start_to_process:', patch_file
-        patch = open(patch_file, 'r')
-        hash_folder = ''
+        patch_content = open(patch_file, 'r')
+
         while 1:
-            line_content = patch.readline()
+            line_content = patch_content.readline()
             if line_content:
-                matchdiff = r'^diff --git a(.*) b(.*)\n'
-                matchhash = r'^From (.*?) '
+                match_diff = r'^diff --git a(.*) b(.*)\n'
 
-                hash = re.findall(matchhash, line_content, re.S)
-                if hash:
-                    hash_folder = out_path + os.sep + order_num+hash[0]
+                file_list = re.findall(match_diff, line_content, re.S)
 
-                    print u'commit hash:', hash[0]
-                    print u'commit folder:', hash_folder
+                if file_list:
+                    file_now_path = project_path + file_list[0][0]
+                    file_final_path = final_folder + file_list[0][0]
 
-                    if os.path.exists(out_path) == False:
-                        os.mkdir(out_path)
-                        pass
-                        # try:
-                    #     os.chdir(out_path)
-                    # except Exception, e:
-                    #     raise e
+                    if not os.path.exists(os.path.dirname(file_final_path)):
+                        os.makedirs(os.path.dirname(file_final_path))
 
-                    if os.path.exists(hash_folder) == False:
-                        os.mkdir(hash_folder)
+                    print u'lastest file_name:' + file_now_path
+                    print u'copy to:' + file_final_path
 
-                list = re.findall(matchdiff, line_content, re.S)
-                if list:
-                    file_now_path = project_path + list[0][0]
-                    file_old_path = hash_folder + list[0][0]
-                    tempdir = os.path.dirname(file_old_path)
-
-                    if os.path.exists(tempdir) == False:
-                        os.makedirs(tempdir)
-
-                    print u'lastest file:' + file_now_path
-                    print u'copy to:' + file_old_path
-                    if os.path.isfile(project_path + list[0][0]):
-                        shutil.copy(project_path + list[0][0], hash_folder + list[0][0])
-
+                    if os.path.isfile(project_path + file_list[0][0]):
+                        shutil.copy(project_path + file_list[0][0], file_final_path)
 
             else:
                 break
 
 
 if __name__ == '__main__':
-    patch_dir = r"C:\wamp\www\GreenCMS_Update\patch"
-    project_path = r"C:\wamp\www\Green2014"
     out_path = r"C:\wamp\www\GreenCMS_Update"
-    print patch_dir
-    #date_from = "2014-01-25"
-    #date_to = "2014-02-26"
-    run(patch_dir, project_path, out_path)
+
+    project_path = r"C:\wamp\www\Green2014"
+
+    patch_dir = out_path + os.sep + 'patch'
+    final_folder = out_path + os.sep + 'finally'
+
+    if not os.path.exists(patch_dir):
+        #todo ....error
+        pass
+
+    if not os.path.exists(final_folder):
+        os.mkdir(final_folder)
+
+    run(patch_dir, project_path, final_folder)
 
 
 
