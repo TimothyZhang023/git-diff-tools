@@ -1,11 +1,27 @@
 # -*- coding: utf-8 -*-
 # admin@zts1993.com
+# git-tool 从指定commit生成增量更新包
 __author__ = 'TianShuo'
 
 import re
 import os
 import shutil
 import zipfile
+import subprocess
+
+
+def del_folder(filename):
+    if os.path.isdir(filename):
+        for root, dirs, files in os.walk(filename, topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+                print  os.path.join(root, name)
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+                print "delete %s" % (os.path.join(root, name))
+        os.rmdir(filename)
+    else:
+        os.remove(filename)
 
 
 def run(patch_dir, project_path, final_folder):
@@ -40,10 +56,10 @@ def run(patch_dir, project_path, final_folder):
                 break
 
 
-def zip_folder(final_folder, out_path, zip_filename):
-    cwd = final_folder
+def zip_folder(files_folder, out_path, zip_filename):
+    cwd = files_folder
     start = cwd.rfind(os.sep) + 1
-    z = zipfile.ZipFile(out_path+zip_filename, mode="w", compression=zipfile.ZIP_DEFLATED)
+    z = zipfile.ZipFile(out_path + zip_filename, mode="w", compression=zipfile.ZIP_DEFLATED)
     try:
         for dirpath, dirs, files in os.walk(cwd):
             for file in files:
@@ -56,20 +72,39 @@ def zip_folder(final_folder, out_path, zip_filename):
 
 
 if __name__ == '__main__':
-    out_path = r"C:\wamp\www\GreenCMS_Update"
+    git_hash = r'cb25c5c43683feb50da3a7d6e3679d0fefcb5ee3'
 
+    out_path = r"C:\wamp\www\GreenCMS_Update_"+git_hash
     project_path = r"C:\wamp\www\Green2014"
 
     patch_dir = out_path + os.sep + 'patch'
     final_folder = out_path + os.sep + 'finally'
-
     zip_filename = 'upgrade.zip'
-    if not os.path.exists(patch_dir):
-        #todo ....error
-        pass
 
-    if not os.path.exists(final_folder):
+    git_path_command = r'"C:\Program Files (x86)\Git\bin\git" format-patch '
+    git_path_command += git_hash
+    git_path_command += r' -o "' + patch_dir + '"'
+
+    print git_path_command
+
+    if not os.path.exists(out_path):
+        os.mkdir(out_path)
+
+    if os.path.exists(patch_dir):
+        del_folder(patch_dir)
+    else:
+        os.mkdir(patch_dir)
+
+    if os.path.exists(final_folder):
+        del_folder(final_folder)
+    else:
         os.mkdir(final_folder)
+
+
+
+    os.chdir(project_path)
+    ps = subprocess.Popen(git_path_command)
+    ps.wait()  #让程序阻塞
 
     run(patch_dir, project_path, final_folder)
 
