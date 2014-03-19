@@ -5,6 +5,7 @@ __author__ = 'TianShuo'
 import re
 import os
 import shutil
+import zipfile
 
 
 def run(patch_dir, project_path, final_folder):
@@ -39,6 +40,21 @@ def run(patch_dir, project_path, final_folder):
                 break
 
 
+def zip_folder(final_folder, out_path, zip_filename):
+    cwd = final_folder
+    start = cwd.rfind(os.sep) + 1
+    z = zipfile.ZipFile(out_path+zip_filename, mode="w", compression=zipfile.ZIP_DEFLATED)
+    try:
+        for dirpath, dirs, files in os.walk(cwd):
+            for file in files:
+                z_path = os.path.join(dirpath, file)
+                z.write(z_path, z_path[start:])
+        z.close()
+    finally:
+        if z:
+            z.close()
+
+
 if __name__ == '__main__':
     out_path = r"C:\wamp\www\GreenCMS_Update"
 
@@ -47,6 +63,7 @@ if __name__ == '__main__':
     patch_dir = out_path + os.sep + 'patch'
     final_folder = out_path + os.sep + 'finally'
 
+    zip_filename = 'upgrade.zip'
     if not os.path.exists(patch_dir):
         #todo ....error
         pass
@@ -55,6 +72,8 @@ if __name__ == '__main__':
         os.mkdir(final_folder)
 
     run(patch_dir, project_path, final_folder)
+
+    zip_folder(final_folder + os.sep, out_path + os.sep, zip_filename)
 
 
 
