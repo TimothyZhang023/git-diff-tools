@@ -2,7 +2,9 @@
 # admin@zts1993.com
 __author__ = 'TianShuo'
 
-import re, os, shutil
+import re
+import os
+import shutil
 
 
 def run(patch_dir, project_path, final_folder):
