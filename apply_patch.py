@@ -13,19 +13,6 @@ import common
 import conf
 
 versionDate = conf.versionDate
-
-if len(sys.argv) < 2:
-    print 'Use default settings.'
-
-if sys.argv[1].startswith('--'):
-    option = sys.argv[1][2:]
-    if option == 'version':  #当命令行参数为-- version，显示版本号
-        print 'Version 1.0'
-    elif option == 'help':  #当命令行参数为--help时，显示相关帮助内容
-        print ''
-    elif option == 'date':  #当命令行参数为--date时，处理
-        versionDate = sys.argv[2]
-
 sourceDir = conf.sourceBaseDir + versionDate + r"\finally"
 targetDir = conf.workingDir
 backupDir = conf.backupBaseDir + versionDate + r"\\"

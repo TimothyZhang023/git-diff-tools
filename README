@@ -2,7 +2,7 @@
 
 apply_patch.py 应用补丁
 gen_patch.py 生成补丁
-gen cmd windows下命令行生成补丁
+backup_all 备份指定目录文件
 
 Contributor:
     zts1993

@@ -76,20 +76,8 @@ def zip_folder(files_folder, out_path, zip_filename):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print 'Use default settings.'
 
-    if sys.argv[1].startswith('--'):
-        option = sys.argv[1][2:]
-        if option == 'version':  #当命令行参数为-- version，显示版本号
-            print 'Version 1.0'
-        elif option == 'help':  #当命令行参数为--help时，显示相关帮助内容
-            print ''
-        elif option == 'hash':  #当命令行参数为--hash时，处理
-            git_hash = sys.argv[2]
-
-    else:
-        git_hash = conf.git_hash
+    git_hash = conf.git_hash
 
     source_dir = conf.originSourceDir
 
