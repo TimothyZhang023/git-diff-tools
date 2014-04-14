@@ -1,13 +1,17 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# admin@zts1993.com
-# git-tool 从指定commit生成增量更新包
-__author__ = 'TianShuo'
+#@author TianShuo
+#@version 2014-03-25 10:57
+# gen_patch 从指定commit生成增量更新包
 
+import sys
 import re
 import os
 import shutil
 import zipfile
 import subprocess
+import common
+import conf
 
 
 def del_folder(filename):
@@ -15,7 +19,7 @@ def del_folder(filename):
         for root, dirs, files in os.walk(filename, topdown=False):
             for name in files:
                 os.remove(os.path.join(root, name))
-                print  os.path.join(root, name)
+                print os.path.join(root, name)
             for name in dirs:
                 os.rmdir(os.path.join(root, name))
                 print "delete %s" % (os.path.join(root, name))
@@ -72,43 +76,42 @@ def zip_folder(files_folder, out_path, zip_filename):
 
 
 if __name__ == '__main__':
-    git_hash = r'cb25c5c43683feb50da3a7d6e3679d0fefcb5ee3'
+    if len(sys.argv) < 2:
+        print 'Use default settings.'
 
-    out_path = r"C:\wamp\www\GreenCMS_Update_"+git_hash
-    project_path = r"C:\wamp\www\Green2014"
+    if sys.argv[1].startswith('--'):
+        option = sys.argv[1][2:]
+        if option == 'version':  #当命令行参数为-- version，显示版本号
+            print 'Version 1.0'
+        elif option == 'help':  #当命令行参数为--help时，显示相关帮助内容
+            print ''
+        elif option == 'hash':  #当命令行参数为--hash时，处理
+            git_hash = sys.argv[2]
 
-    patch_dir = out_path + os.sep + 'patch'
-    final_folder = out_path + os.sep + 'finally'
-    zip_filename = 'upgrade.zip'
-
-    git_path_command = r'"C:\Program Files (x86)\Git\bin\git" format-patch '
-    git_path_command += git_hash
-    git_path_command += r' -o "' + patch_dir + '"'
-
-    print git_path_command
-
-    if not os.path.exists(out_path):
-        os.mkdir(out_path)
-
-    if os.path.exists(patch_dir):
-        del_folder(patch_dir)
     else:
-        os.mkdir(patch_dir)
+        git_hash = conf.git_hash
 
-    if os.path.exists(final_folder):
-        del_folder(final_folder)
-    else:
-        os.mkdir(final_folder)
+    source_dir = conf.originSourceDir
 
+    zip_filename = conf.versionDate + '_upgrade.zip'
 
+    workspace = conf.outSourceDir + os.sep + git_hash
 
-    os.chdir(project_path)
+    if not os.path.exists(workspace):
+        os.makedirs(workspace)
+
+    patch_dir = workspace + os.sep + 'patch'
+    final_dir = workspace + os.sep + 'finally'
+
+    git_path_command = conf.gitPath + r' format-patch ' + git_hash + r' -o "' + patch_dir + '"'
+
+    os.chdir(source_dir)
     ps = subprocess.Popen(git_path_command)
     ps.wait()  #让程序阻塞
 
-    run(patch_dir, project_path, final_folder)
+    run(patch_dir, source_dir, final_dir)
 
-    zip_folder(final_folder + os.sep, out_path + os.sep, zip_filename)
+    common.zip_folder(final_dir + os.sep, workspace + os.sep, zip_filename)
 
 
 

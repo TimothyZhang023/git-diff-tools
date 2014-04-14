@@ -1,10 +1,16 @@
-通过git-patch生成增量更新文件
+通过git-patch生成增量更新文件并应用
 
-
+apply_patch.py 应用补丁
+gen_patch.py 生成补丁
+gen cmd windows下命令行生成补丁
 
 Contributor:
     zts1993
 
+Project Used:
+    GreenCMS
+    TSW OA
+
 如果有疑问欢迎大家反馈
 BUG提交可以直接发ISSUE
-                                              2014/3/11
+                                              2014/4/14
